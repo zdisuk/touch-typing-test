@@ -1,6 +1,6 @@
-import { getQuote } from '@/services/quotes';
-import {defineStore} from 'pinia'
-import { ref } from 'vue'
+import { getQuote } from "@/services/quotes";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 
 interface Letter {
   id: number;
@@ -9,29 +9,29 @@ interface Letter {
   correct: boolean;
 }
 
-export const useQuoteStore = defineStore('quoteStore', () => {
-  const input = ref('')
-  const lastEnteredId = ref<number | null>(null)
-  const quote = ref('')
-  const quoteLetters = ref<Map<number, Letter>>(new Map())
+export const useQuoteStore = defineStore("quoteStore", () => {
+  const input = ref("");
+  const lastEnteredId = ref<number | null>(null);
+  const quote = ref("");
+  const quoteLetters = ref<Map<number, Letter>>(new Map());
 
   function setInput(newInput: string) {
-    input.value = newInput
+    input.value = newInput;
   }
 
   function setLastEnteredId(newId: number) {
-    lastEnteredId.value = newId
+    lastEnteredId.value = newId;
   }
 
   function splitQuote(quoteText: string) {
-    quoteText.split('').forEach((letter, index) => {
+    quoteText.split("").forEach((letter, index) => {
       quoteLetters.value.set(index + 1, {
         letter: letter,
         typed: false,
         id: index + 1,
-        correct: false
+        correct: false,
       });
-    })
+    });
   }
 
   async function load() {
@@ -40,5 +40,14 @@ export const useQuoteStore = defineStore('quoteStore', () => {
     quote.value = data.text;
   }
 
-  return { quoteLetters, splitQuote, input, setInput, lastEnteredId, setLastEnteredId, load, quote }
-})
+  return {
+    quoteLetters,
+    splitQuote,
+    input,
+    setInput,
+    lastEnteredId,
+    setLastEnteredId,
+    load,
+    quote,
+  };
+});
