@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { nextTick, onMounted } from "vue";
 import QuoteText from "./components/QuoteText.vue";
 import QuoteInput from "./components/QuoteInput.vue";
 
@@ -9,9 +9,16 @@ import { storeToRefs } from "pinia";
 const quoteStore = useQuoteStore();
 const { quote } = storeToRefs(quoteStore);
 
-onMounted(async () => {
+async function initQuote() {
   await quoteStore.load();
   quoteStore.splitQuote(quote.value);
+  nextTick(() => {
+    quoteStore.setCaretPosition(1);
+  });
+}
+
+onMounted(() => {
+  initQuote();
 });
 </script>
 

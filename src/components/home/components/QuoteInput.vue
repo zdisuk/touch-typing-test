@@ -1,19 +1,60 @@
 <script setup lang="ts">
+import { useInputStore } from "@/stores/input";
 import { useQuoteStore } from "@/stores/quote";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 
-const quoteStore = useQuoteStore();
-const { input } = storeToRefs(quoteStore);
+const inputStore = useInputStore();
+const { lastEnteredId } = storeToRefs(inputStore);
 
-function handleQuoteInput(event: Event) {
-  const target = event.target as HTMLInputElement;
-  quoteStore.setInput(target.value);
+const quoteStore = useQuoteStore();
+const { quoteLetters } = storeToRefs(quoteStore);
+
+function handleInputEnter(inputValue: string, letterId: number) {
+  const current = quoteLetters.value.get(letterId);
+  const previous = quoteLetters.value.get(letterId - 1);
+  const entered = inputValue.charAt(letterId - 1);
+
+  if (!current || !entered) return;
+
+  current.typed = true;
+  if (previous && !previous.correct) {
+    current.correct = false;
+    return;
+  }
+
+  current.correct = current.letter === entered;
 }
 
-const quoteInput = ref<HTMLInputElement>();
+function handleInputDelete(letterId: number) {
+  if (lastEnteredId.value && lastEnteredId.value > letterId) {
+    for (let i = letterId + 1; i < lastEnteredId.value + 1; i++) {
+      const deletedLetter = quoteLetters.value.get(i);
+      if (!deletedLetter) return;
+
+      deletedLetter.correct = false;
+      deletedLetter.typed = false;
+    }
+
+    inputStore.setLastEnteredId(letterId);
+    return;
+  }
+}
+
+function handleInput(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const letterId = target.value.length;
+
+  handleInputEnter(target.value, letterId);
+  handleInputDelete(letterId);
+
+  inputStore.setLastEnteredId(letterId);
+  quoteStore.setCaretPosition(letterId + 1);
+}
+
+const inputElement = ref<HTMLInputElement>();
 onMounted(() => {
-  quoteInput.value?.focus();
+  inputElement.value?.focus();
 });
 </script>
 
@@ -22,8 +63,7 @@ onMounted(() => {
     ref="quoteInput"
     type="text"
     class="quote-input"
-    :value="input"
-    @input="handleQuoteInput"
+    @input="handleInput"
   />
 </template>
 
