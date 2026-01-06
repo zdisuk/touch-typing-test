@@ -15,7 +15,7 @@ function letterClass(letter) {
 <template>
   <div class="quote-container">
     <span
-      v-for="[id, letter] in quoteLetters"
+      v-for="(letter, id) in quoteLetters"
       :id="`${id}`"
       :key="id"
       class="quote-letter"
@@ -46,6 +46,10 @@ function letterClass(letter) {
   position: absolute;
   width: 2px;
   background-color: paleturquoise;
+  transition:
+    top 120ms ease-out,
+    left 120ms ease-out,
+    height 120ms ease-out;
 }
 
 .correct {
