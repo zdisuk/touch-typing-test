@@ -13,7 +13,7 @@ async function initQuote() {
   await quoteStore.load();
   quoteStore.splitQuote(quote.value);
   nextTick(() => {
-    quoteStore.setCaretPosition(1);
+    quoteStore.setCaretPosition(0);
   });
 }
 
